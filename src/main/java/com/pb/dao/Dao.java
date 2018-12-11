@@ -37,6 +37,6 @@ public interface Dao<T> {
     /**
      * 执行批量更新操作
      */
-    void batch(String sql, Object ... args);
+    void batch(String sql, Object[] ... args);
 
 }

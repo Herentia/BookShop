@@ -4,6 +4,8 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -37,6 +39,22 @@ public class JDBCUtil {
                 conn.close();
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void closeConn(Connection conn, PreparedStatement ps, ResultSet rs) {
+        try {
+            if(rs != null) {
+                rs.close();
+            }
+            if(ps != null) {
+                ps.close();
+            }
+            if(conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
