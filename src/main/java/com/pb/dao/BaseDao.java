@@ -23,7 +23,7 @@ public class BaseDao<T> implements Dao<T> {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-
+            conn = JDBCUtil.getConn();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
