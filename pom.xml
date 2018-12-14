@@ -28,9 +28,38 @@
     </dependency>
 
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- JSP api -->
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.2</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--JSTL-->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+    <dependency>
       <groupId>c3p0</groupId>
       <artifactId>c3p0</artifactId>
       <version>0.9.1.2</version>
+    </dependency>
+
+    <!-- 引入Oracle数据库驱动 -->
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>ojdbc6</artifactId>
+      <version>11.2.0.1.0</version>
     </dependency>
 
     <dependency>

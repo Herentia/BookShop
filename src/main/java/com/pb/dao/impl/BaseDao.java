@@ -119,7 +119,7 @@ public class BaseDao<T> implements Dao<T> {
 
         try {
             conn = JDBCUtil.getConn();
-//            queryRunner.batch(conn, sql, params);
+            queryRunner.batch(conn, sql, params);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

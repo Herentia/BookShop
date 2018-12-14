@@ -5,6 +5,7 @@ import com.pb.entity.Book;
 import com.pb.web.CriteriaBook;
 import com.pb.web.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -13,30 +14,52 @@ import java.util.List;
  */
 public class BookDaoImpl extends BaseDao<Book> implements BookDao {
 
+    /**
+     * 通过ID获取书本信息
+     * @param id book的id
+     * @return
+     */
     @Override
     public Book getBook(int id) {
-        String sql = "select id, author, title, publishingdate, salesamount, storenumber, remark" +
+        String sql = "select id, author, title, price, publishingdate, salesamount, storenumber, remark" +
                 " from bs_book where id = ?";
         return query(sql, id);
     }
 
     @Override
     public Page<Book> getPage(CriteriaBook cb) {
-        return null;
+        //获取指定页面的页面数据
+        Page<Book> page = new Page<>(cb.getPageNo());
+        page.setPageSize(3);
+        //设置总记录数
+        page.setTotalItemNumber(getTotalBookNumber(cb));
+        //效验pageno的合法性
+        cb.setPageNo(page.getPageNo());
+        //设置页面的数据信息
+        page.setList(getPageList(cb, 3));
+        return page;
     }
 
     @Override
     public long getTotalBookNumber(CriteriaBook cb) {
-        return 0;
+        String sql = "select count(id) from bs_book where price > ? and price < ?";
+        BigDecimal totalBookNumber =  getSingleVal(sql, cb.getMinPrice(), cb.getMaxPrice());
+        return totalBookNumber.longValue();
     }
 
     @Override
     public List<Book> getPageList(CriteriaBook cb, int pageSize) {
-        return null;
+        String sql = "select * from (select b.*,ROWNUM rn from bs_book b where " +
+                "price <= ? and price >= ? and ROWNUM <= ? order by id) " +
+                "where rn > ?";
+        return queryForList(sql, cb.getMaxPrice(), cb.getMinPrice(),
+                pageSize * cb.getPageNo(), (cb.getPageNo() - 1) * pageSize);
     }
 
     @Override
     public int getStoreNumber(Integer id) {
-        return 0;
+        String sql = "select storenumber from bs_book where id = ?";
+        BigDecimal storenumber = getSingleVal(sql, id);
+        return storenumber.intValue();
     }
 }

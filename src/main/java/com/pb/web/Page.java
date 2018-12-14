@@ -44,6 +44,10 @@ public class Page<T> {
         return pageSize;
     }
 
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
     //设置当前页需要显示的List集合
     public void setList(List<T> list) {
         this.list = list;
