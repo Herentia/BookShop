@@ -10,11 +10,19 @@
 <script type="text/javascript" src="script/jquery-3.3.1.js"></script>
 <script type="text/javascript">
     $(function() {
-        $("a").click(function() {
-            var serializeVal = $(":hidden").serialize();
-            var href = this.href + "&" + serializeVal;
-            window.location.href = href;
-            return false;//阻止<a>标签执行原来的跳转，而是执行click事件里面的跳转
+        // $("a").click(function() {
+        //     var serializeVal = $(":hidden").serialize();
+        //     var href = this.href + "&" + serializeVal;
+        //     window.location.href = href;
+        //     return false;//阻止<a>标签执行原来的跳转，而是执行click事件里面的跳转
+        // })
+        $("a").each(function() {
+            $(this).onclick(function() {
+                var serializeVal = $(":hidden").serialize();
+                var href = this.href + "&" + serializeVal;
+                window.location.href = href;
+                return false;//阻止<a>标签执行原来的跳转，而是执行click事件里面的跳转
+            })
         })
     })
 </script>

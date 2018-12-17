@@ -50,7 +50,7 @@
             <br><br>
         </c:if>
 
-        <c:if test="${!empty sessionScope.shoppingCart}">
+        <c:if test="${!empty sessionScope.shoppingCart.books}">
             您的购物车中有${sessionScope.shoppingCart.bookNumber} 本书，
             <a href="bookServlet?method=toCartPage&pageNo=${bookpage.pageNo }">查看购物车</a>
         </c:if>

@@ -49,4 +49,29 @@ public class BookService {
         return false;
     }
 
+    /**
+     * 删除购物车中指定商品
+     * @param shoppingCart
+     * @param id
+     */
+    public void remove(ShoppingCart shoppingCart, Integer id) {
+        shoppingCart.removeItem(id);
+    }
+
+    /**
+     * 清空购物车
+     * @param shoppingCart
+     */
+    public void clear(ShoppingCart shoppingCart) {
+        shoppingCart.clear();
+    }
+
+    /**
+     * 修改购物车商品数量
+     * @param id
+     * @param quantity
+     */
+    public void updateItemQuantity(ShoppingCart sc, int id, int quantity) {
+        sc.updateItemQuantity(id, quantity);
+    }
 }

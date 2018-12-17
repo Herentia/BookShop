@@ -1,5 +1,6 @@
 package com.pb.servlet;
 
+import com.alibaba.fastjson.JSON;
 import com.pb.entity.Book;
 import com.pb.service.BookService;
 import com.pb.utils.BookStoreWebUtils;
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author haohan
@@ -139,6 +142,74 @@ public class BookServlet extends HttpServlet {
      */
     public void toCartPage(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("/WEB-INF/bookshop/shoppingCart.jsp").forward(req, resp);
+    }
+
+    /**
+     * 删除购物车中的指定商品
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void remove(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String idStr = req.getParameter("id");
+        int id = -1;
+        try{
+            id = Integer.parseInt(idStr);
+        } catch (Exception e) {}
+
+        ShoppingCart shoppingCart = BookStoreWebUtils.getShoppingCart(req);
+        bookService.remove(shoppingCart, id);
+        if(shoppingCart.isEmpty()) {
+            req.getRequestDispatcher("/WEB-INF/bookshop/emptyCart.jsp").forward(req, resp);
+        }
+        req.getRequestDispatcher("/WEB-INF/bookshop/shoppingCart.jsp").forward(req, resp);
+    }
+
+    /**
+     * 清空购物车
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void clear(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ShoppingCart shoppingCart = BookStoreWebUtils.getShoppingCart(req);
+        bookService.clear(shoppingCart);
+        req.getRequestDispatcher("/WEB-INF/bookshop/emptyCart.jsp").forward(req, resp);
+    }
+
+    /**
+     * 修改购物车中商品的数量
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void updateItemQuantity(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String idStr = req.getParameter("id");
+        String quantityStr = req.getParameter("quantity");
+        ShoppingCart shoppingCart = BookStoreWebUtils.getShoppingCart(req);
+
+        int id = -1;
+        int quantity = -1;
+
+        try{
+            id = Integer.parseInt(idStr);
+            quantity = Integer.parseInt(quantityStr);
+        } catch(Exception e) {}
+        //当id和商品数量都大于0时执行修改购物车商品数量
+        if(id > 0 && quantity > 0) {
+            bookService.updateItemQuantity(shoppingCart, id, quantity);
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("bookNumber", shoppingCart.getBookNumber());
+        map.put("totalMoney", shoppingCart.getTotalMoney());
+
+        String jsonStr = JSON.toJSONString(map);
+        resp.setContentType("text/javascript");
+        resp.getWriter().print(jsonStr);
     }
 
 }
