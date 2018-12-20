@@ -2,10 +2,13 @@ package com.pb.dao.impl;
 
 import com.pb.dao.BookDao;
 import com.pb.entity.Book;
+import com.pb.entity.ShoppingCartItem;
 import com.pb.web.CriteriaBook;
 import com.pb.web.Page;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -61,5 +64,19 @@ public class BookDaoImpl extends BaseDao<Book> implements BookDao {
         String sql = "select storenumber from bs_book where id = ?";
         BigDecimal storenumber = getSingleVal(sql, id);
         return storenumber.intValue();
+    }
+
+    @Override
+    public void batchUpdateStoreNumberAndSalesAmount(Collection<ShoppingCartItem> items) {
+        String sql = "update bs_book set salesAmount = salesAmount + ?, storeNumber = storeNumber - ?" +
+                " where id = ?";
+        Object [][] params = new Object[items.size()][3];
+        List<ShoppingCartItem> lsci = new ArrayList<>(items);
+        for(int i = 0; i < lsci.size(); i++) {
+            params[i][0] = lsci.get(i).getQuantity();
+            params[i][1] = lsci.get(i).getBook().getStoreNumber();
+            params[i][2] = lsci.get(i).getBook().getId();
+        }
+        batch(sql, params);
     }
 }

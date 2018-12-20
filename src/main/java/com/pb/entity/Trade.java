@@ -1,6 +1,7 @@
 package com.pb.entity;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author haohan
@@ -11,6 +12,8 @@ public class Trade {
     private int tradeId;
     private Date tradeTime;
     private int userId;
+
+    private Set<TradeItem> tradeItems;
 
     public Trade() {
     }
@@ -43,6 +46,14 @@ public class Trade {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public Set<TradeItem> getTradeItems() {
+        return tradeItems;
+    }
+
+    public void setTradeItems(Set<TradeItem> tradeItems) {
+        this.tradeItems = tradeItems;
     }
 
     @Override

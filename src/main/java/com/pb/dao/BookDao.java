@@ -1,6 +1,7 @@
 package com.pb.dao;
 
 import com.pb.entity.Book;
+import com.pb.entity.ShoppingCartItem;
 import com.pb.web.CriteriaBook;
 import com.pb.web.Page;
 
@@ -51,10 +52,10 @@ public interface BookDao {
     public abstract int getStoreNumber(Integer id);
 
     /**
-     * 根据传入的ShoppingCartItem集合
+     * 根据传入的ShoppingCartItem集合批量修改卖出数量和库存
      * 批量的更新storeNumber和SalesAmount
      * @param items
      */
-//    public abstract void batchUpdateStoreNumberAndSalesAmount(Collection<ShoppingCartItem> items);
+    public abstract void batchUpdateStoreNumberAndSalesAmount(Collection<ShoppingCartItem> items);
 
 }

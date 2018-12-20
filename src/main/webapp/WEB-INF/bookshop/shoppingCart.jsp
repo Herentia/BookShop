@@ -88,6 +88,7 @@
             })
         })
     </script>
+    <%@ include file="/commons/queryCondition.jsp" %>
 </head>
 <body>
     <div align="center">
@@ -113,9 +114,9 @@
                 <td colspan="4" id="totalMoney">总金额：￥${sessionScope.shoppingCart.totalMoney} 元</td>
             </tr>
             <tr>
-                <td colspan="1"><a href="">继续购物</a></td>
+                <td colspan="1"><a href="bookServlet?method=getBooks&pageNo=${param.pageNo}">继续购物</a></td>
                 <td colspan="1"><a href="bookServlet?method=clear">全部删除</a></td>
-                <td colspan="2"><a href="">结账</a></td>
+                <td colspan="2"><a href="bookServlet?method=forwardPage&page=cash">结账</a></td>
             </tr>
         </table>
     </div>

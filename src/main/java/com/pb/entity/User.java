@@ -1,5 +1,7 @@
 package com.pb.entity;
 
+import java.util.Set;
+
 /**
  * @author haohan
  * 12/11/2018 - 03:54 下午
@@ -9,6 +11,8 @@ public class User {
     private int userId;
     private String userName;
     private int accountId;
+
+    private Set<Trade> trades;
 
     public User() {
     }
@@ -41,6 +45,14 @@ public class User {
 
     public void setAccountId(int accountId) {
         this.accountId = accountId;
+    }
+
+    public Set<Trade> getTrades() {
+        return trades;
+    }
+
+    public void setTrades(Set<Trade> trades) {
+        this.trades = trades;
     }
 
     @Override

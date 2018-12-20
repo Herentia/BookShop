@@ -1,12 +1,18 @@
 package com.pb.servlet;
 
 import com.alibaba.fastjson.JSON;
+import com.pb.entity.Account;
 import com.pb.entity.Book;
+import com.pb.entity.ShoppingCartItem;
+import com.pb.entity.User;
+import com.pb.service.AccountService;
 import com.pb.service.BookService;
+import com.pb.service.UserService;
 import com.pb.utils.BookStoreWebUtils;
 import com.pb.web.CriteriaBook;
 import com.pb.web.Page;
 import com.pb.web.ShoppingCart;
+import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,7 +30,11 @@ import java.util.Map;
  */
 public class BookServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 8828949191426782015L;
+
     private BookService bookService = new BookService();
+    private UserService userService = new UserService();
+    private AccountService accountService = new AccountService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -45,6 +55,8 @@ public class BookServlet extends HttpServlet {
 //            method.invoke(this, req, resp);
         } catch (Exception e) {
             e.printStackTrace();
+            //如有异常，将异常抛出，否则事务处理过滤器无法捕获异常导致不能回滚
+            throw new RuntimeException(e);
         }
     }
 
@@ -140,9 +152,14 @@ public class BookServlet extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    public void toCartPage(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/WEB-INF/bookshop/shoppingCart.jsp").forward(req, resp);
+//    public void toCartPage(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        req.getRequestDispatcher("/WEB-INF/bookshop/shoppingCart.jsp").forward(req, resp);
+//    }
+    public void forwardPage(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String page = req.getParameter("page");
+        req.getRequestDispatcher("/WEB-INF/bookshop/"+ page +".jsp").forward(req, resp);
     }
+
 
     /**
      * 删除购物车中的指定商品
@@ -210,6 +227,93 @@ public class BookServlet extends HttpServlet {
         String jsonStr = JSON.toJSONString(map);
         resp.setContentType("text/javascript");
         resp.getWriter().print(jsonStr);
+    }
+
+    /**
+     * 支付页面验证
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void cash(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String username = req.getParameter("username");
+        String accountId = req.getParameter("accountId");
+
+        StringBuffer errors = new StringBuffer("");
+        errors = validateFromField(username, accountId);    //验证是否为空
+        if(errors.toString().equals("")) {
+            errors = validateUser(username, accountId);     //验证用户名账号是否匹配
+            if(errors.toString().equals("")) {
+                errors = validateStoreNumber(req);          //验证库存是否充足
+                if(errors.toString().equals("")) {
+                    errors = validateBalance(req, accountId);//验证余额是否充足
+                }
+            }
+        }
+
+        if(!errors.toString().equals("")) {                 //当错误信息不为空时，则转发到页面并显示信息
+            req.setAttribute("errors", errors);
+            req.getRequestDispatcher("/WEB-INF/bookshop/cash.jsp").forward(req, resp);
+            return;
+        }
+
+        //验证全部通过后进入到结账步骤（暂为非事务）
+
+
+    }
+
+    //验证余额是否充足
+    public StringBuffer validateBalance(HttpServletRequest req, String accountId) {
+        StringBuffer error = new StringBuffer("");
+        ShoppingCart shoppingCart = BookStoreWebUtils.getShoppingCart(req);
+        Account account = accountService.getAccount(Integer.parseInt(accountId));
+        if(shoppingCart.getTotalMoney() > account.getBanlance()) {
+            error.append("余额不足");
+        }
+        return error;
+    }
+
+    //验证商品库存是否充足
+    public StringBuffer validateStoreNumber(HttpServletRequest req) {
+        StringBuffer error = new StringBuffer("");
+        ShoppingCart shoppingCart = BookStoreWebUtils.getShoppingCart(req);
+        for(ShoppingCartItem sci : shoppingCart.getItems()) {
+            int quantity = sci.getQuantity();
+            int storeNumber = bookService.getBook(sci.getBook().getId()).getStoreNumber();
+            if(quantity > storeNumber)
+                error.append(sci.getBook().getTitle() + "数量不足");
+        }
+        return error;
+    }
+
+    //根据用户名验证该账号是否属于该用户
+    public StringBuffer validateUser(String username, String accountId) {
+        StringBuffer error = new StringBuffer("");
+        User user = userService.getUserByName(username);
+        boolean flag = false;
+        if(user != null) {
+            int accountId1 = user.getAccountId();
+            if(accountId.equals("" + accountId1)) {
+                flag = true;
+            }
+        }
+        if(!flag) {
+            error.append("用户名和账号不匹配");
+        }
+        return error;
+    }
+
+    //验证支付的用户名、账号是否不为空
+    public StringBuffer validateFromField(String username, String accountId) {
+        StringBuffer error = new StringBuffer("");
+        if(username == null || username.trim().equals("")) {
+            error.append("用户名不能为空<br>");
+        }
+        if(accountId == null || accountId.trim().equals("")) {
+            error.append("支付账号不能为空");
+        }
+        return error;
     }
 
 }
